@@ -1,70 +1,59 @@
-// Load CSV data
-d3.csv('311_boston_data.csv').then(data => {
-    // Process the data
-    data.forEach(d => {
-        d.Count = +d.Count; // Convert Count to a number
-    });
+// Load the CSV file and build the bar chart
+d3.csv("311_boston_data.csv").then(data => {
+    // Convert Count to a number
+    data.forEach(d => d.Count = +d.Count);
 
-    // Sort the data by Count in descending order. first step to top 10
-    data.sort((a, b) => b.Count - a.Count);
+    // Set dimensions and margins
+    const margin = { top: 20, right: 30, bottom: 40, left: 200 };
+    const width = 800 - margin.left - margin.right;
+    const height = data.length * 25;
 
-    // Take only the top 10 types
-    const top10Data = data.slice(0, 10);
-
-    // Set up SVG container
-    const svgWidth = 800;
-    const svgHeight = 500;
-    const margin = { top: 40, right: 40, bottom: 80, left: 200 };
-    const width = svgWidth - margin.left - margin.right;
-    const height = svgHeight - margin.top - margin.bottom;
-
-    const svg = d3.select('#chart_311')
-        .append('svg')
-        .attr('width', svgWidth)
-        .attr('height', svgHeight)
-        .append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
+    // Create the SVG canvas
+    const svg = d3.select("#chart")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Create scales
-    const yScale = d3.scaleBand()
-        .domain(top10Data.map(d => d.reason))
-        .range([0, height])
-        .padding(0.2);
-
-    const xScale = d3.scaleLinear()
-        .domain([0, d3.max(top10Data, d => d.Count)])
+    const x = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.Count)])
         .range([0, width]);
 
-    // Create bars
-    svg.selectAll('rect')
-        .data(top10Data)
-        .enter()
-        .append('rect')
-        .attr('x', 0)
-        .attr('y', d => yScale(d.reason))
-        .attr('width', d => xScale(d.Count))
-        .attr('height', yScale.bandwidth())
-        .attr('fill', 'blue')
-        .on('mouseover', function (event, d) {
-            d3.select(this).attr('fill', 'orange'); // Change color on hover
-        })
-        .on('mouseout', function () {
-            d3.select(this).attr('fill', 'blue'); // Revert color on mouseout
-        });
+    const y = d3.scaleBand()
+        .domain(data.map(d => d.reason))
+        .range([0, height])
+        .padding(0.1);
 
     // Add axes
-    svg.append('g')
-        .call(d3.axisLeft(yScale));
+    svg.append("g")
+        .call(d3.axisLeft(y));
 
-    svg.append('g')
-        .attr('transform', `translate(0,${height})`)
-        .call(d3.axisBottom(xScale));
+    svg.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).ticks(5));
 
-    // Add attribution line at the bottom
-    svg.append('text')
-        .attr('x', width / 2)
-        .attr('y', height + margin.top + 20) // Adjust the y-coordinate for proper placement
-        .attr('text-anchor', 'left')
-        .style('font-size', '12px')
-        .text('Chart created by Aarushi Sahejpal. Data source: Boston.gov');
+    // Create bars
+    svg.selectAll(".bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("y", d => y(d.reason))
+        .attr("height", y.bandwidth())
+        .attr("x", 0)
+        .attr("width", d => x(d.Count));
+
+    // Add labels
+    svg.selectAll(".label")
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("class", "label")
+        .attr("y", d => y(d.reason) + y.bandwidth() / 2)
+        .attr("x", d => x(d.Count) + 5)
+        .attr("dy", ".35em")
+        .text(d => d.Count);
 });
+
