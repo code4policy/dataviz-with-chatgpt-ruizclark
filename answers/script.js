@@ -2,10 +2,12 @@
 d3.csv("311_boston_data.csv").then(data => {
     // Convert Count to a number
     data.forEach(d => d.Count = +d.Count);
+
+    // Sort the data in descending order based on Count
     data.sort((a, b) => b.Count - a.Count);
 
-    // Set dimensions and margins
-    const margin = { top: 20, right: 30, bottom: 40, left: 200 };
+    // Set dimensions and margins (increase right margin for space)
+    const margin = { top: 20, right: 50, bottom: 40, left: 200 };
     const width = 800 - margin.left - margin.right;
     const height = data.length * 25;
 
@@ -55,6 +57,7 @@ d3.csv("311_boston_data.csv").then(data => {
         .attr("y", d => y(d.reason) + y.bandwidth() / 2)
         .attr("x", d => x(d.Count) + 5)
         .attr("dy", ".35em")
+        .style("font-size", "12px")
         .text(d => d.Count);
 });
 
