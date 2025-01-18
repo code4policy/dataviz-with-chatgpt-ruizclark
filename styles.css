@@ -1,0 +1,37 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+p {
+    font-family: 'Poppins', sans-serif;
+    margin: 20px;
+}
+
+#chart {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bar {
+    fill: maroon;
+}
+
+.bar:hover {
+    fill: orange;
+}
+
+.axis text {
+    font-size: 12px;
+}
+
+.axis path, .axis line {
+    fill: none;
+    shape-rendering: crispEdges;
+}
